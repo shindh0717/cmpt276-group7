@@ -41,11 +41,11 @@ The group unanimously agreed to proceed with this idea.
 
 3. Infrastructure Setup
 
-GitHub Repository: Created by Donghoon Shin (shindh0717/cmpt276-group7)
+    GitHub Repository: Created by Donghoon Shin (shindh0717/cmpt276-group7)
 
-Render Deployment: Initial Spring Boot app deployed to Render
+    Render Deployment: Initial Spring Boot app deployed to Render
 
-All members have been added as contributors to the repository.
+    All members have been added as contributors to the repository.
 
 4. Proposal Write-up
 - The group decided to collaboratively write the project proposal in Google Docs
