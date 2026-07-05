@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UsersController {
     @GetMapping("/users/view")
     public String getAllusers() {
-        return "users/showAll";
+        return "users/login";
     }
 
-    @GetMapping("/showAll")
-    public String showAll() {
-        return "users/showAll";
+    @GetMapping("/login")
+    public String login() {
+        return "users/login";
     }
 
     @GetMapping("/signin")
