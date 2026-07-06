@@ -43,8 +43,8 @@ public class UsersController {
 
     @PostMapping("Authentication/signin")
     public String addUser (@RequestParam Map<String, String> newuser, HttpServletResponse response) {
-        String newName = newuser.get("key:name");
-        String newpwd = newuser.get("key:password");
+        String newName = newuser.get("uname");
+        String newpwd = newuser.get("p");
         userRepo.save(new Users(newName,newpwd));
         response.setStatus(201);
         return "Authentication/login";
