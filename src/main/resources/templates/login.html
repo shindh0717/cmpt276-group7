@@ -19,21 +19,17 @@
                 <h1 class="text-center mt-5 mb-4">Log into WhereTo </h1>
                 <form method="post" th:action="@{/login}" th:object="${loginForm}">
                     <div class="mb-3">
-                        <input th:field="*{email}" type="email" id="email" name="email" class="form-control form-control-lg"
-                            placeholder="Email">
+                        <input th:field="*{email}" type="email" class="form-control form-control-lg" placeholder="Email">
                     </div>
                     <div class="mb-3">
 
-                        <input th:field="*{password}" type="password" id="password" name="password" class="form-control form-control-lg"
-                            placeholder="Password">
+                        <input th:field="*{password}" type="password" class="form-control form-control-lg" placeholder="Password">
                     </div>
                     <div th:if="${error}">
                         <span th:text="${error}"></span>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <input class="btn btn-dark" type="submit" value="Login"></input>
-                    </div>
+                    <button type="submit" class="btn btn-dark">Login</button>
 
 
                 </form>
