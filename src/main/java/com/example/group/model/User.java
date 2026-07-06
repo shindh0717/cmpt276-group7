@@ -61,7 +61,7 @@ public class User {
     public boolean isAdmin() {
         return "admin".equalsIgnoreCase(this.role);
     }
-}
+
     @Id
     private String email;
     private String password;
