@@ -38,4 +38,10 @@ public class UsersController {
         repo.save(newUser);
         return "redirect:/profile";
     }
+
+     @GetMapping("/login")
+    public String Login(){
+
+        return "login.html";
+    }
 }
