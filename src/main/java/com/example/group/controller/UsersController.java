@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.group.model.User;
 import com.example.group.model.UsersRepository;
+import com.example.group.Services.UserService;
+import jakarta.servlet.http.HttpSession;
+import java.util.List
 
 @Controller
 public class UsersController {
