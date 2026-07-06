@@ -34,7 +34,6 @@ public class Users {
     public void setPassword(String password) {
         this.password = password;
     }
-
     public int getUid() {
         return uid;
     }
@@ -42,5 +41,4 @@ public class Users {
     public void setUid(int uid) {
         this.uid = uid;
     }
-    
 }
