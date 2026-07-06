@@ -49,7 +49,7 @@ public class UsersController {
     public String Login(Model model) {
         model.addAttribute("loginForm", new User());
 
-        return "login.html";
+        return "login";
     }
 
     @PostMapping("/login")
