@@ -1,4 +1,4 @@
-package com.example.group.repositories;
+package com.example.group.model;
 
 import com.example.group.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +10,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
-    Optional<User> findByUsername(String username);
+    Optional<User> findById(Long id);
 }

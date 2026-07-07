@@ -12,18 +12,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
+
 import com.example.group.model.User;
-import com.example.group.model.UsersRepository;
+import com.example.group.model.UserRepository;
 import com.example.group.Services.UserService;
 import jakarta.servlet.http.HttpSession;
-import java.util.List
+import java.util.List;
 
 @Controller
 public class UsersController {
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     @Autowired
-    private UsersRepository repo;
+    private UserRepository repo;
 
+
+    @GetMapping("/")
+    public RedirectView process(){
+        return new RedirectView("/signup");
+    }
     @GetMapping("/signup")
     public String showSignupPage() {
         return "signup";
@@ -31,7 +38,7 @@ public class UsersController {
 
     @PostMapping("/signup")
     public String addUser(@RequestParam String email, @RequestParam String password, Model model) {
-        if (repo.findById(email).isPresent()) {
+        if (repo.findByEmail(email).isPresent()) {
             model.addAttribute("email_error", "That email is already registered to an account");
             return "signup";
         }
@@ -58,25 +65,25 @@ public class UsersController {
     @PostMapping("/login")
     public String loginUser(@ModelAttribute User LoginForm, Model model) {
 
-        Optional<User> user = repo.findById(LoginForm.getEmail());
+        Optional<User> user = repo.findByEmail(LoginForm.getEmail());
 
         if (user.isPresent()) {
 
             if (encoder.matches(LoginForm.getPassword(), user.get().getPassword())) {
                 if (user.get().getRole() == "admin") {
-                    return "admin.html";
+                    return "admin";
                 } else {
-                    return "homepage.html";
+                    return "map";
 
                 }
 
             } else {
                 model.addAttribute("error", " Invalid email or password");
-                return "login.html";
+                return "login";
             }
         }
 
-        return "signup.html";
+        return "signup";
     }
 
     @Autowired

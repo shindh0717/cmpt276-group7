@@ -7,9 +7,7 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User {
     
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    /*
     
     @Column(unique = true, nullable = false)
     private String username;
@@ -54,15 +52,18 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
     */
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    // public LocalDateTime getCreatedAt() { return createdAt; }
+    // public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     
     // Helper method to check if user is admin
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     public boolean isAdmin() {
         return "admin".equalsIgnoreCase(this.role);
     }
 
-    @Id
     private String email;
     private String password;
     private String role;
