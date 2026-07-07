@@ -63,6 +63,8 @@ public class User implements Serializable{
   
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int uid;
     private String email;
     private String password;
     private String role;
