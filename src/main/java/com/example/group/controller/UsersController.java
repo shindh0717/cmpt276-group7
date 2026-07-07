@@ -1,22 +1,23 @@
 package com.example.group.controller;
 
-import org.springframework.ui.Model;
-import org.springframework.stereotype.Controller;
-
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.group.Services.UserService;
 import com.example.group.model.User;
 import com.example.group.model.UsersRepository;
-import com.example.group.Services.UserService;
+
 import jakarta.servlet.http.HttpSession;
-import java.util.List
 
 @Controller
 public class UsersController {
@@ -56,27 +57,32 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public String loginUser(@ModelAttribute User LoginForm, Model model) {
+    public String loginUser(@ModelAttribute("loginForm")User loginForm, Model model, HttpSession session) {
 
-        Optional<User> user = repo.findById(LoginForm.getEmail());
+        Optional<User> userOpt = repo.findById(loginForm.getEmail());
 
-        if (user.isPresent()) {
-
-            if (encoder.matches(LoginForm.getPassword(), user.get().getPassword())) {
-                if (user.get().getRole() == "admin") {
-                    return "admin.html";
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            
+            if (encoder.matches(loginForm.getPassword(), user.getPassword())) {
+               
+                session.setAttribute("user", user);
+                
+               
+                if ("admin".equals(user.getRole())) {
+                    return "redirect:/admin/dashboard";
                 } else {
-                    return "homepage.html";
-
+                    return "redirect:/profile"; 
                 }
-
             } else {
-                model.addAttribute("error", " Invalid email or password");
-                return "login.html";
+                model.addAttribute("error", "Invalid email or password");
+                return "login";
             }
+        } else {
+            return "redirect:/signup";
         }
 
-        return "signup.html";
+       
     }
 
     @Autowired
