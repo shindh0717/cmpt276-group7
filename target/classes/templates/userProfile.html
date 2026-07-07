@@ -13,8 +13,8 @@
            
             <p><strong>Email:</strong> <span th:text="${user.email}">john@email.com</span></p>
             <p><strong>Role:</strong> 
-                <span th:if="${user.isAdmin()}" class="badge-admin">Admin</span>
-                <span th:unless="${user.isAdmin()}" class="badge-user">Regular User</span>
+                <span th:if="${user.admin}" class="badge-admin">Admin</span>
+                <span th:unless="${user.admin}" class="badge-user">Regular User</span>
             </p>
            
         </div>
