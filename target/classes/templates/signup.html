@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Signup Page</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row justify-content-center">
+			<div class="col-md-4">
+				<h1 class="text-center mt-5 mb-4">Sign Up</h1>
+				<form method="post" action="/signup" >
+					<p th:if="${email_error}" th:text="${email_error}" style="color:black;"></p>
+					<p th:if="${password_error}" th:text="${password_error}" style="color:black;"></p>
+					<div class="mb-3">
+						<input type="email" id="email" name="email" class="form-control form-control-lg"
+                            placeholder="Email">
+					</div>
+                    <div class="mb-3">
+						<input type="password" id="password" name="password" class="form-control form-control-lg"
+                            placeholder="Password">
+					</div>
+                    <div class="d-grid gap-2">
+                        <input class="btn btn-primary" style="background-color: #206adc" type="submit" value="Sign Up"></input>
+                    </div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

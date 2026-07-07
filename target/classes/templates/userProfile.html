@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile - WhereTo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>👤 My Profile</h1>
+        
+        <div class="profile-card">
+           
+            <p><strong>Email:</strong> <span th:text="${user.email}">john@email.com</span></p>
+            <p><strong>Role:</strong> 
+                <span th:if="${user.isAdmin()}" class="badge-admin">Admin</span>
+                <span th:unless="${user.isAdmin()}" class="badge-user">Regular User</span>
+            </p>
+           
+        </div>
+        
+        <div class="actions">
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

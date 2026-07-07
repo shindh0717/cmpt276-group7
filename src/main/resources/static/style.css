@@ -1,0 +1,27 @@
+gmp-map {
+    height: 100%;
+}
+
+#map-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.type-select {
+    width: 400px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 10px;
+    flex-grow: 1;
+    padding: 0 10px;
+    margin-left: 20px;
+    margin-top: 20px;
+}
