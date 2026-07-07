@@ -1,22 +1,23 @@
 package com.example.group.controller;
 
-import org.springframework.ui.Model;
-import org.springframework.stereotype.Controller;
-
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.group.Services.UserService;
 import com.example.group.model.User;
 import com.example.group.model.UsersRepository;
-import com.example.group.Services.UserService;
+
 import jakarta.servlet.http.HttpSession;
-import java.util.List;
 
 @Controller
 public class UsersController {
@@ -55,8 +56,8 @@ public class UsersController {
         return "login";
     }
 
-     @PostMapping("/login")
-    public String loginUser(@ModelAttribute User loginForm, Model model, HttpSession session) {
+    @PostMapping("/login")
+    public String loginUser(@ModelAttribute("loginForm")User loginForm, Model model, HttpSession session) {
 
         Optional<User> userOpt = repo.findById(loginForm.getEmail());
 
