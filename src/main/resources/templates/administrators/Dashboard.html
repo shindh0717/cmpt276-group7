@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+    </header>
+    <main class="container-fluid">
+            <div class= "row justify-content-center">
+                <div class ="col-md-4">
+                    <h1>USERS</h1>
+                    <ul>
+                        <li th:each="user:${us}">
+                            <span th:text="${user.name}"></span> <br>
+                            <span th:text="${user.password}"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    </main>
+        <nav>
+            <a href="/login">Log Out</a> <br>
+        </nav>
+    <footer>
+        
+    </footer>
+</body>
+</html>
