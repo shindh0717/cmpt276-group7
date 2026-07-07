@@ -61,11 +61,6 @@ public class User implements Serializable{
     public void setRole(String role) { this.role = role; }
     */
   
-    
-    // Helper method to check if user is admin
-    public boolean isAdmin() {
-        return "admin".equalsIgnoreCase(this.role);
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -93,5 +88,12 @@ public class User implements Serializable{
     public void setRole(String role)
     {
         this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return "admin".equalsIgnoreCase(this.role);
+    }
+    public boolean getAdmin(){
+        return isAdmin();
     }
 }

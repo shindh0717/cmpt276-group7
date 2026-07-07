@@ -130,15 +130,11 @@ public class UsersController {
     
     @GetMapping("/profile")
     public String userProfile(Model model, HttpSession session) {
-        
-        User currentUser = (User) session.getAttribute("user");
-        
-        if (currentUser == null) {
+        User currentUser = (User)session.getAttribute("user");
+        if (currentUser == null){
             return "redirect:/login";
         }
-        
         model.addAttribute("user", currentUser);
-        
         return "userProfile";
     }
     
