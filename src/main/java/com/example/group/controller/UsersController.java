@@ -72,7 +72,7 @@ public class UsersController {
                 if ("admin".equals(user.getRole())) {
                     return "redirect:/admin/dashboard";
                 } else {
-                    return "redirect:profile"; 
+                    return "redirect:/profile"; 
                 }
             } else {
                 model.addAttribute("error", "Invalid email or password");
