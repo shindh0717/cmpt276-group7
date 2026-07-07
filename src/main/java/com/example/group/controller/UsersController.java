@@ -46,7 +46,7 @@ public class UsersController {
         newUser.setPassword(hash);
         newUser.setRole("regular");
         repo.save(newUser);
-        return "redirect:/profile";
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
@@ -117,7 +117,7 @@ public class UsersController {
         
         model.addAttribute("user", currentUser);
         
-        return "user-profile";
+        return "userProfile";
     }
     
     @GetMapping("/access-denied")
