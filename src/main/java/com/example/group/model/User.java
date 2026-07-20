@@ -65,11 +65,15 @@ public class User implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    public Long getId() {
+        return id;
+    }
     private String email;
     private String password;
     private String role;
     
     public User(){}
+    
     public String getEmail() {
         return email;
     }

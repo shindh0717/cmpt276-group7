@@ -23,6 +23,26 @@
         <option value="museum">Museum</option>
         <option value="park">Park</option>
       </select>
+      <form action="/saveLocation" method="post" id="locationForm">
+        <input type="text" name="locationName" placeholder="e.g. Home, work etc" required>
+        <input type="hidden" name="latitude" id="hiddenLat">
+        <input type="hidden" name="longitude" id="hiddenLong">
+        <button type="button" onclick="submitLocation()">Save Location</button>
+      </form>
+
+      <script>
+        function submitLocation(){
+          navigator.geolocation.getCurrentPosition((position)=>
+            {document.getElementById('hiddenLat').value = position.coords.latitude;
+            document.getElementById('hiddenLong').value = position.coords.longitude;
+            document.getElementById('locationForm').submit();}, (error) =>{
+              alert("error getting Location");
+
+            }
+
+          );
+        }
+      </script>
       <button>
         <a href="/logout" class="btn-logout">Logout</a>
       </button>
