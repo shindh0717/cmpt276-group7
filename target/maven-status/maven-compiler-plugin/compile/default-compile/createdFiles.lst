@@ -1,7 +1,9 @@
-com\example\group\model\UserRepository.class
-com\example\group\config\SessionConfig.class
-com\example\group\GroupApplication.class
-com\example\group\model\User.class
-com\example\group\controller\UsersController.class
-com\example\group\Services\UserService.class
-com\example\group\config\SessionInterceptor.class
+com/example/group/model/SavedLocationRepository.class
+com/example/group/controller/UsersController.class
+com/example/group/config/SessionConfig.class
+com/example/group/model/UserRepository.class
+com/example/group/config/SessionInterceptor.class
+com/example/group/model/User.class
+com/example/group/model/SavedLocation.class
+com/example/group/GroupApplication.class
+com/example/group/Services/UserService.class
