@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${route.name} + ' - Shared Route'">Shared Route - WhereTo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ <span th:text="${route.name}">Route Name</span></h1>
+        
+        <div class="shared-info">
+            <p><strong>Shared by:</strong> <span th:text="${route.createdBy.email}">user@example.com</span></p>
+            <p><strong>Description:</strong> <span th:text="${route.description}">Description</span></p>
+        </div>
+        
+        <h3>📍 Stops</h3>
+        <ol>
+            <li th:each="location : ${route.locations}">
+                <span th:text="${location}">Location Name</span>
+            </li>
+        </ol>
+        
+        <div class ="share-section" th:if="${shareUrl != null}">
+            <h1>share this route</h1>
+            <input
+                id="shareLink"
+                type="text"
+                th:value="${shareUrl}"
+                readonly>
+            <button onclick="copyShareLink()">
+                Copy Link
+            </button>
+        </div>
+
+        <div class = "actions">
+            <a href="/login" class = "btn-primary">
+                Login to Save This Route
+            </a>
+
+            <a href = "/" class="btn-back">
+                To Home
+            </a>
+        </div>
+        
+    </div>
+        
+    <script>
+        function copyShareLink() {
+            const input = document.getElementById("shareLink");
+
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            alert("Share Link Copied")
+        }
+    </script>
+</body>
+</html>
