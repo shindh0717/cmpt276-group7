@@ -1,6 +1,12 @@
 const mapElement = document.querySelector('gmp-map');
 const typeSelect = document.querySelector('.type-select');
 var innerMap, currentLocationDot, infoWindow;
+const marker = document.getElementById("marker");
+const latInput = document.getElementById("lat-input");
+const lngInput = document.getElementById("lng-input");
+const showSavedBtn = document.getElementById('show-saved-btn');
+const savedLocationsPanel = document.getElementById('saved-locations-panel');
+
 
 function createCurrentDot(){
   const div = document.createElement('div');
@@ -14,13 +20,55 @@ function createCurrentDot(){
 async function createMap() {
     const { Map, InfoWindow } = await google.maps.importLibrary('maps');
     const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+    const { Geocoder } = await google.maps.importLibrary('geocoding');
 
     infoWindow = new InfoWindow();
     innerMap = mapElement.innerMap;
+    const geocoder = new Geocoder();
 
     innerMap.setOptions({
         mapTypeControl: false,
     });
+
+    marker.addListener("click", () => {
+      infoWindow.open({
+        anchor: marker,
+        map: innerMap,
+      });
+    });
+
+    innerMap.addListener("click", (e) => {
+      if (!e.latLng){
+        return;
+      }
+      infoWindow.close();
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+
+      marker.position = { lat, lng };
+      marker.map = innerMap;
+
+      latInput.value = lat;
+      lngInput.value = lng;
+
+      geocoder.geocode({location: {lat, lng}}, (results, status) => {
+        const address = (status === "OK" && results[0]) ? results[0].formatted_address : "Address not found";
+        const selectedInfo = `
+          <div>
+            <strong>Selected Location</strong>
+            <div>${address}</div>
+            <button id="save-location-btn" style="margin-top: 8px;">Save This Location</button>
+          </div>
+        `;
+        infoWindow.setContent(selectedInfo);
+        infoWindow.open({
+          anchor: marker,
+          map: innerMap,
+        });
+      });
+    })
+
+
 
     navigator.geolocation.getCurrentPosition((position) => {
       const pos = {
@@ -50,9 +98,9 @@ async function searchSimilar(){
   ]);
 
   const markers = mapElement.querySelectorAll('gmp-advanced-marker');
-  markers.forEach(marker => {
-    if (marker != currentLocationDot){
-      marker.map = null;
+  markers.forEach(m => {
+    if (m != currentLocationDot && m != marker){
+      m.map = null;
     }
   })
 
@@ -108,5 +156,16 @@ async function searchSimilar(){
     alert("No results found nearby");
   }
 }
+
+showSavedBtn.addEventListener('click', () => {
+  if (savedLocationsPanel.style.display === 'none'){
+    savedLocationsPanel.style.display = 'block';
+    showSavedBtn.textContent = 'Hide Saved Location';
+  }
+  else{
+    savedLocationsPanel.style.display = 'none';
+    showSavedBtn.textContent = 'Show Saved Location';
+  }
+})
 
 void createMap();

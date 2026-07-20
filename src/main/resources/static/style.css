@@ -15,6 +15,26 @@ body {
     padding: 0;
 }
 
+#saved-locations-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 3px solid black;
+  z-index: 100;
+}
+
+#saved-locations-panel h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #333;
+}
+
 .type-select {
     width: 400px;
     height: 30px;
@@ -23,5 +43,17 @@ body {
     flex-grow: 1;
     padding: 0 10px;
     margin-left: 20px;
-    margin-top: 20px;
+    margin: 0;
+}
+
+#controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+#controls button {
+    height: 30px;
+	padding: 0 15px;
 }
