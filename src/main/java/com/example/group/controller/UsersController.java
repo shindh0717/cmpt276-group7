@@ -22,6 +22,7 @@ import com.example.group.model.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
 
+
 @Controller
 public class UsersController {
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -38,10 +39,10 @@ public class UsersController {
         return "signup";
     }
 
-    @GetMapping("/map")
+/*     @GetMapping("/map")
     public String showMapPage() {
         return "map";
-    }
+    }*/
 
     @PostMapping("/signup")
     public String addUser(@RequestParam String email, @RequestParam String password, Model model) {

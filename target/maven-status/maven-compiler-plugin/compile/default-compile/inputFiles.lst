@@ -1,7 +1,10 @@
-C:\cmpt\group\src\main\java\com\example\group\config\SessionConfig.java
-C:\cmpt\group\src\main\java\com\example\group\config\SessionInterceptor.java
-C:\cmpt\group\src\main\java\com\example\group\controller\UsersController.java
-C:\cmpt\group\src\main\java\com\example\group\GroupApplication.java
-C:\cmpt\group\src\main\java\com\example\group\model\User.java
-C:\cmpt\group\src\main\java\com\example\group\model\UserRepository.java
-C:\cmpt\group\src\main\java\com\example\group\Services\UserService.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/GroupApplication.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/Services/UserService.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/config/SessionConfig.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/config/SessionInterceptor.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/controller/SaveLocationController.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/controller/UsersController.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/model/SavedLocation.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/model/SavedLocationRepository.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/model/User.java
+/Users/aveerseikhon/cmpt276-group7-3/src/main/java/com/example/group/model/UserRepository.java
