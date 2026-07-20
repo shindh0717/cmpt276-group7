@@ -23,7 +23,7 @@ public class SaveLocationController {
         {
             return "map";
         }
-        List<SavedLocation> locations = repo.findByUser(user);
+        List<SavedLocation> locations = repo.findByUserId(user.getId());
         model.addAttribute("savedLocations", locations);
         return "map";
     }
@@ -36,7 +36,7 @@ public class SaveLocationController {
         return "redirect:/map";
     }
     repo.findById(id).ifPresent(location->{
-        if ((location.getUser() != null) && location.getUser().getEmail().equals(user.getEmail()))
+        if ((location.getUserId() != null) && location.getUserId().equals(user.getId()))
         {
             repo.delete(location);
         }
