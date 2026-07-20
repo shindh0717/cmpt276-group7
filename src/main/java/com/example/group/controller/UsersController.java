@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.example.group.Services.UserService;
+import com.example.group.model.SavedLocation;
+import com.example.group.model.SavedLocationRepository;
 import com.example.group.model.User;
 import com.example.group.model.UserRepository;
 
@@ -28,6 +30,9 @@ public class UsersController {
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     @Autowired
     private UserRepository repo;
+
+    @Autowired
+    private SavedLocationRepository loco;
 
     @GetMapping("/")
     public RedirectView process(){
@@ -86,7 +91,7 @@ public class UsersController {
                 if ("admin".equals(user.getRole())) {
                     return "redirect:/admin/dashboard";
                 } else {
-                    return "redirect:profile"; 
+                    return "redirect:/profile"; 
                 }
             } else {
                 model.addAttribute("error", "Invalid email or password");
@@ -143,4 +148,22 @@ public class UsersController {
     public String accessDenied() {
         return "access-denied";
     }
+     @PostMapping("/saveLocation")
+    public String saveLocation( @RequestParam String locationName, @RequestParam Double latitude, @RequestParam Double longitude, HttpSession session){
+        User loggedUser = (User) session.getAttribute("user");
+
+        if(loggedUser == null){
+            return "redirect:/login";
+        }
+
+        SavedLocation location = new SavedLocation();
+        location.setLocationName(locationName);
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        location.setUserId(loggedUser.getId());
+
+        loco.save(location);
+
+       return  "redirect:/map";
+}
 }

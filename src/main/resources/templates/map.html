@@ -14,7 +14,7 @@
     zoom="15" 
     map-id="DEMO_MAP_ID"
   >
-    <gmp-advanced-marker></gmp-advanced-marker>
+    <gmp-advanced-marker id="marker"></gmp-advanced-marker>
     <div id="controls" slot="control-inline-start-block-start">
       <select name="types" class="type-select">
         <option value="" selected>Similar location</option>
@@ -23,10 +23,48 @@
         <option value="museum">Museum</option>
         <option value="park">Park</option>
       </select>
+      <form action="/saveLocation" method="post" id="locationForm">
+        <input type="text" name="locationName" placeholder="e.g. Home, work etc" required>
+        <input type="hidden" name="latitude" id="hiddenLat">
+        <input type="hidden" name="longitude" id="hiddenLong">
+        <button type="button" onclick="submitLocation()">Save Location</button>
+      </form>
+
+      <script>
+        function submitLocation(){
+          navigator.geolocation.getCurrentPosition((position)=>
+            {document.getElementById('hiddenLat').value = position.coords.latitude;
+            document.getElementById('hiddenLong').value = position.coords.longitude;
+            document.getElementById('locationForm').submit();}, (error) =>{
+              alert("error getting Location");
+
+            }
+
+          );
+        }
+      </script>
       <button>
         <a href="/logout" class="btn-logout">Logout</a>
       </button>
+      <button id="show-saved-btn">
+        Show Saved Location
+      </button>
     </div>
   </gmp-map>
+  <div id="saved-locations-panel" style="display: none;">
+    <h3>Saved locations</h3>
+
+    <!-- <ul>
+      <li>test</li>
+      <li th:each="">
+        <span th:text="${name}"></span>
+        <span th:text="${address}"></span>
+        <button type="button" class="go-btn" th:attr="data-lat=${lat},data-lng=${lng}">Go</button>
+        <a th:href="@{/location/delete(id=${id})}">
+          <button type="button">Delete</button>
+        </a>
+      </li>
+    </ul> -->
+  </div>
 </body>
 </html>
