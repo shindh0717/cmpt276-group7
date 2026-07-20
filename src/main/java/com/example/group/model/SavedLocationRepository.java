@@ -5,5 +5,5 @@ import java.util.List;
 
 @Repository
 public interface SavedLocationRepository extends JpaRepository<SavedLocation, Long> {
-    List<SavedLocation> findByUser(User user);
+    List<SavedLocation> findByUserId(Long userId);
 }
