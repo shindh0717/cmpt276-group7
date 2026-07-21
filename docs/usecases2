@@ -1,0 +1,101 @@
+Project Name: Where To
+Requirements and Specification Document
+07/20/2026, version 2 
+Black: Iteration 1, Blue: Iteration 2
+Group 7
+
+Project Abstraction
+Where To is a map-based web application for the general public. It solves common travel problems with five main features: saving frequent spots to avoid repetition, a rating-based ranking system to prevent blind choices, offline mapping for unconnected areas, similar location recommendations for alternatives, and route sharing for easy trip coordination with others. Designed for 5 group members, these 5 individual features provide a complete navigation tool.
+
+Customer
+The primary customers for Where To are the general public and everyday travelers of all ages who frequently plan trips or visits to new places. These users often get annoyed because they have to use separate apps for finding directions and checking reviews. They need a simple app that can easily save and share their favorite spots. It also targets people who plan trips with friends or family and struggle to organize routes together. By putting everything into one app, it helps anyone who wants to stop jumping between different apps and copying the same information over and over when planning a trip.
+
+Competitive Analysis
+The main competitor in this market is general map applications like Google Maps. While these general map applications are widely used for finding directions and location information, they do not combine all the necessary trip-planning tools in one place. Users must use separate apps and services just to save favorite spots, check ratings, find alternatives, or share routes with others. Where To brings all these essential features into a single web application. Our application provides saving frequent locations without redundancy, ranking places based on ratings to prevent blind choices, offline maps for unconnected areas, suggesting similar alternative locations, and sharing routes directly to make group trip planning much easier.
+
+User Stories
+General cases:
+1. The persona is an unregistered user, the story is as follows: a new user wants to sign up for the application with and email and password. On success the result is their account will be made and they will be redirected to the login page. A test case is that a suitable email and password is provided, an account within the database to be creates successfully. A failure case is an empty email where the user should expect to be repromoted for another email, or an email that does not contain an @ and at least one character after it or they will again be repromoted for another email, or they enter a password with fewer than 8 characters where they will be reprompted for another password. 
+2. The persona is a registered user, the story is as follows: a registered user wants to login to their account with their email and password. On success the result is they are redirected to the user profile page. The test cases are that the email and password must be registered to an account, the user is authenticated and redirected, the failure cases are as follows: if the email doesn’t contain an @ and at least one symbol after it, the user is repromoted for a valid email, if the password or email is incorrect it will say invalid email or password and the user is repromoted for them. 
+3. The persona is a registered user, the story is as follows: after logging in a user has arrived at their profile page and views the different features. The result is they can view their email and role within the system (defaults to regular), they can log out of their account, or they can proceed to the map. If logout is pressed, they will simply be redirected back to the login page. If they press the proceed to map button they will be redirected to the view location feature on the map. 
+4. The persona is a site admin. The story is as follows: an admin logs in with their special admin email and password. The result is the admin has arrived at the dashboard where they can view the total number of users in the database, the emails corresponding to their accounts, and the time of the creation of their accounts. 
+5. The persona is a site admin. The story is as follows: an admin is at the dashboard where they press the logout button. The result is the admin gets redirected to the login page. 
+6. The persona is a sneaky user. The story is as follows: a user attempts to access the admin dashboard by typing in /admin-dashboard at the end of the url. The result is they will be intercepted and redirected to an access denied page where they receive a “You don't have permission to view this page” message and a button to redirect them back to their profile page. 
+7. The persona is a curious unregistered user. The story is as follows: an unregistered user attempts to view their profile despite not having an account by typing in /profile at the end of the url. The result is they will be intercepted and redirected to the login page where they can make an account first.
+8. The persona is a registered user, the story is as follows: a user wants to add a new marker to the map by clicking anywhere on it. On success the result is a marker will be placed on the map. A test case is that a valid click location is provided, a marker within the map interface to be created successfully. A failure case is when the map component has not fully loaded yet and the user clicks on the interface, where they should expect no marker to be placed.
+9. The persona is a registered user, the story is as follows: a user wants to view specific details of a location by clicking on a marker. On success the result is they view the location information and a Save Location button. The test case is that clicking an existing marker successfully displays its info and the button, while the failure case is clicking an area where no marker exists.
+10. The persona is a registered user, the story is as follows: after viewing a location's details, a user wants to save that location by clicking the Save Location button. The result is that the location is successfully added to their saved location list. The test case is that clicking an Save Location button successfully displays its info in saved location lists, and a failure case is clicking the button multiple times or when no marker is selected.
+11. The persona is a registered user, the story is as follows: a user wants to view their saved locations by clicking the Show Saved Location button. The result is that the saved location list toggles to become visible or hidden. A test case is clicking the button to successfully open the list, and a failure case is attempting to toggle when the list data fails to load.
+12. The persona is a registered user, the story is as follows: a user is viewing the saved location list and wants to navigate to a specific spot by clicking Go button in the list. The result is the map centers and moves directly to that location. A test case is clicking Go button in saved list to successfully moves the map, and a failure case is clicking a list item with missing coordinate data.
+13. The persona is a registered user, the story is as follows: a user wants to remove some location by clicking Delete button in the list. The result is that location is successfully removed from the list. A test case is clicking Delete button in saved list to successfully delete the item, and a failure case is when network error occurs.
+14. The persona is an curious unregistered user, the story is as follows: an unregistered user attempts to access the map page, but they must first go through login, then profile, and finally can see the go to map button. The result is that they cannot access the map directly. A test case is trying to access the map page while unregistered to go /profile and see the go to map button, and a failure case is if an unregistered user types /map.
+15. The persona is a sneaky unregistered user, the story is as follows: an unregistered user didn't login and types /map to access the map page. The result is that they can view the map interface, but when they attempt to click the Save Location button, they are redirected to the login screen. A test case is typing /map to gain unauthorized access to the map and trying to save a location, and a failure case is when an unregistered user successfully save a location without login.
+16. The persona is a registered user, the story is as follows: they have been shared a route by another registered user and are viewing it on the /route-share page. The result is they can view its details and press either a “Back” or “Accept” button. A test case is if they press “Back”, they will be taken back to the /map page with no route, or if they press “Accept” they will be taken to the /map page with the shared route.
+
+Map specific cases: 
+The map shows the user's current location with a blue dot. Click the 'Similar location' dropdown and select either "Cafe", "Restaurant", "Museum", or "Park". If you select a category, the system searches for the 20 nearest places of that type. If you select the "Similar location", the system clears all markers from the map, leaving only the blue dot. If you click on a marker on the map, the system displays name and address of that location. If you click on a logout button, it will logout and go back to login page. The map allows users to add a marker by clicking anywhere on the map. Clicking on a marker displays its information with a 'Save Location' button, which adds the location to the saved location list. A 'Show Saved Location' button toggles the saved location list. Clicking the Go button moves the map directly to that location, and clicking the Delete button removes it from the list.
+Test cases: Similar location feature 
+Input: 
+1. A selection from "Similar location" dropdown 
+2. User clicking on a map marker 
+Tests: 
+1. Test for inputs where the user selects a category, and 20 nearest places are successfully displayed. 
+2. Test for inputs where the user selects 'Similar location' and all markers disappears from the map. 
+3. Test for inputs where no results found nearby 
+4. Test for inputs where the user clicks on a marker to see specific location details 
+5. Test for inputs where the user clicks logout button 
+Output: 
+1. Markers display 
+2. Markers disappear 
+3. “No results found nearby” error message 
+4. Shows name and address of the selected location. 
+5. Logs out and go back to login page
+Test cases: Save location feature
+Input: 
+1. User clicking on the map
+2. User clicking on a map marker
+3. User clicking the Show Saved Location button
+4. User clicking the Save Location button
+5. User clicking the Go button in the saved location list
+6. User clicking the Delete button in the saved location list
+Tests:
+1. Test for inputs where the user clicks on the map and a new marker is successfully added.
+2. Test for inputs where the user clicks on a marker to see the location information and Save Location button.
+3. Test for inputs where the user clicks the Save Location button and the location is added to the saved location list.
+4. Test for inputs where the user clicks the Show Saved Location button to toggle the saved location list.
+5. Test for inputs where the user clicks the Go button in the saved location list.
+6. Test for inputs where the user clicks the Delete button in the saved location list.
+Output:
+1. Marker is added to the map
+2. Displays location information and Save Location button
+3. Location is added to the saved location list
+4. Toggles the saved location list
+5. Map centers on the selected saved location. 
+6. Location is removed from the saved location list. 
+
+User Interface Requirements
+ 
+/signup
+This page is used to make an account, enter the chosen email and password then press the signup button below.
+
+ 
+/login
+This page is used to login into your account, enter the corresponding email and password then press the login button below.
+ 
+/profile
+This page displays the information pertaining to your account including your email and role which defaults to regular for any new users. The logout link on the bottom left takes you back to the login page, the go to map link to its right takes you to the map. 
+
+ 
+/admin/dashboard
+This page displays information about the accounts registered to the website (only visible to the admin), it shows the number of accounts at the top, and the emails and roles pertaining to all accounts at the bottom.
+ 
+/map
+This page shows a map of your area, the similar location button in the top left shows a list of genres between café, restaurant, museum, and park. When one of them is pressed it displays pins across the map pertaining to those types of locations. To the right of it is a logout button when pressed it takes you back to the login page. To save a location you simply press on any location on the map and an option to save it will come up, pressing the show saved location button will bring up the list of saved locations in the top right corner. From there you can hide the list or remove a location from it aswell.
+ 
+/route-shared
+This page shows the details of a route that is shared to a user. It lists the name of the route at the very top, followed by who shared it, then a description of the route. It lists the potential stops on the way there aswell as buttons to go back or accept the route.
+
+Velocity Measurement
+During iteration 1, the number of completed user stories covering components like signup, login, logout, profile page, admin dashboard, and map features, was 11 in total. This puts our groups velocity measurement at 11 user stories per iteration which is a speed we will look to match. This number reflects solely completed user stories.
+
+
