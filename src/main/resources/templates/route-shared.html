@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${route.name} + ' - Shared Route'">Shared Route - WhereTo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ <span th:text="${route.name}">Route Name</span></h1>
+        
+        <div class="shared-info">
+            <p><strong>Shared by:</strong> <span th:text="${route.createdBy}">User</span></p>
+            <p><strong>Description:</strong> <span th:text="${route.description}">Description</span></p>
+        </div>
+        
+        <h3>📍 Stops</h3>
+        <ol>
+            <li th:each="location : ${route.locations}" th:text="${location}">Location Name</li>
+        </ol>
+        
+        <div class="actions">
+            <a href="/login" class="btn-primary">Login to Save This Route</a>
+            <a href="/" class="btn-back">← Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
