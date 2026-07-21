@@ -77,4 +77,20 @@ public class RouteController {
 
         return "route-shared";
     }
+
+
+    public Route getLatestRoute(User user) {
+        return routeRepository.findTopByCreatedByOrderByIdDesc(user).orElseThrow(() -> new RuntimeException("no routes found"));
+    }
+
+    @GetMapping("/latest-route")
+public String latestRoute(HttpSession session) {
+
+    User user = (User) session.getAttribute("user");
+
+    Route route = getLatestRoute(user);
+
+    return "redirect:/route-shared/" + route.getId();
+}
+
 }
