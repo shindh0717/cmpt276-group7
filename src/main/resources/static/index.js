@@ -16,6 +16,20 @@ function createCurrentDot(){
   return div;
 }
 
+window.savePlace = function(name, lat, lng){
+  const savedOnes = savedLocationsPanel.innerText || savedLocationsPanel.textContent;
+
+  if(savedOnes.includes(name)){
+    alert("This location is already saved");
+    return;
+  }
+
+  document.getElementById('lat-input').value = lat;
+  document.getElementById('lng-input').value = lng;
+  document.getElementById('name-input').value = name;
+  document.getElementById('save-form').submit();  
+}
+
 async function createMap() {
     const { Map, InfoWindow } = await google.maps.importLibrary('maps');
     const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
@@ -136,21 +150,20 @@ async function searchSimilar(){
   const { places } = await Place.searchNearby(request);
 
   if (places.length > 0){
-    places.forEach((place) => {
+    places.forEach((place, i) => {
       const marker = new AdvancedMarkerElement({
         map: innerMap,
         position: place.location,
       });
+
+      const safeName = place.displayName.replace(/'/g, '');
+      const lat = place.location.lat();
+      const lng = place.location.lng();
       const info = `
         <div>
           <strong>${place.displayName}</strong>
           <div>${place.formattedAddress}</div>
-          <button onClick="
-            document.getElementById('lat-input').value = ${place.location.lat()};
-            document.getElementById('lng-input').value = ${place.location.lng()};
-            document.getElementById('name-input').value = '${place.displayName}';
-            document.getElementById('save-form').submit();
-          " style="margin-top=10px;">Save This Location</button>
+          <button onclick="savePlace('${safeName}', ${lat}, ${lng})" style="margin-top: 10px;">Save This Location</button>
         </div>
       `;
       marker.addListener("click", (e) => {
