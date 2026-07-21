@@ -12,9 +12,10 @@
         <div class="profile-card">
            
             <span th:text="${user != null ? user.email : 'No email'}">john@email.com</span>
+            <!-- <span th:text="${user != null ? user.email : 'No email'}">john@email.com</span> -->
             <p><strong>Role:</strong> 
-                <span th:if="${user != null and user.admin}" class="badge-admin">Admin</span>
-                <span th:unless="${user != null and user.admin}" class="badge-user">Regular User</span>
+            <span th:if="${user != null and user.admin}" class="badge-admin">Admin</span>
+            <span th:unless="${user != null and user.admin}" class="badge-user">Regular User</span>
             </p>
            
         </div>
