@@ -3,47 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>WhereTo - Map</title>
   <link rel="stylesheet" type="text/css" href="./style.css" />
   <script type="module" src="./index.js"></script>
   <script>(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})
       ({key: "AIzaSyAMoapWcdUnJXZLIOj8Qgp2t1sTDLGHzqU", v: "weekly", language: "en"});</script>
 </head>
 <body>
-  <gmp-map 
-    zoom="15" 
-    map-id="DEMO_MAP_ID"
-  >
-    <gmp-advanced-marker id="marker"></gmp-advanced-marker>
-    <div id="controls" slot="control-inline-start-block-start">
-      <select name="types" class="type-select">
-        <option value="" selected>Similar location</option>
-        <option value="cafe">Cafe</option>
-        <option value="restaurant">Restaurant</option>
-        <option value="museum">Museum</option>
-        <option value="park">Park</option>
-      </select>
-      <form id="save-form" th:action="@{/saveLocation}" method="post">
-        <input type="hidden" id="lat-input" name="latitude" />
-        <input type="hidden" id="lng-input" name="longitude" />
-        <input type="hidden" id="name-input" name="locationName"/>
-      </form>
-      <button>
-        <a href="/logout" class="btn-logout">Logout</a>
-      </button>
-      <button id="show-saved-btn">
-        Show Saved Location
-      </button>
+  <div id="map-container">
+    <div id="map-wrapper">
+      <gmp-map 
+        zoom="15" 
+        map-id="DEMO_MAP_ID"
+      >
+        <gmp-advanced-marker id="marker"></gmp-advanced-marker>
+        <div id="controls" slot="control-inline-start-block-start">
+          <select name="types" class="type-select">
+            <option value="" selected>Similar location</option>
+            <option value="cafe">Cafe</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="museum">Museum</option>
+            <option value="park">Park</option>
+          </select>
+          <form id="save-form" th:action="@{/saveLocation}" method="post">
+            <input type="hidden" id="lat-input" name="latitude" />
+            <input type="hidden" id="lng-input" name="longitude" />
+            <input type="hidden" id="name-input" name="locationName"/>
+          </form>
+          <button>
+            <a href="/logout" class="btn-logout">Logout</a>
+          </button>
+          <button id="show-saved-btn">
+            Show Saved Location
+          </button>
+        </div>
+      </gmp-map>
     </div>
-  </gmp-map>
+
+    <div id="ranking-sidebar">
+      <h2>⭐ WhereTo Rankings</h2>
+      
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search any place (e.g., McDonald's, Starbucks)">
+        <button onclick="searchLocations()">🔍 Search</button>
+      </div>
+      
+      <div id="results-count"></div>
+      
+      <div id="ranking-list">
+        <div id="ranking-container">
+          <p class="no-results">🔍 Search for a place to see rankings</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="saved-locations-panel" style="display: none;">
     <h3>Saved locations</h3>
     <ul>
       <li th:each="loc:${savedLocations}">
         <span th:text="${loc.locationName}"></span>
-
         <div style="display: flex; gap: 5px;">
-          <button type="button" class="go-btn" style="width: 60px; height: 30px;"  th:attr="data-lat=${loc.latitude},data-lng=${loc.longitude}" th:onclick="'panToLocation(' + ${loc.latitude} + ', ' + ${loc.longitude} + ')'">Go</button>
+          <button type="button" class="go-btn" style="width: 60px; height: 30px;" th:attr="data-lat=${loc.latitude},data-lng=${loc.longitude}" th:onclick="'panToLocation(' + ${loc.latitude} + ', ' + ${loc.longitude} + ')'">Go</button>
           <a th:href="@{/location/delete(id=${loc.id})}">
             <button type="button" style="width: 60px; height: 30px;">Delete</button>
           </a>
@@ -51,5 +72,281 @@
       </li>
     </ul>
   </div>
+
+  <div id="ratingModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeRatingModal()">&times;</span>
+      
+      <h3 id="modal-location-name">Location Name</h3>
+      <p id="modal-location-address" class="modal-address">Address</p>
+      
+      <div id="modal-current-rating">
+        <div class="rating-summary">
+          <span class="big-stars" id="modal-avg-stars">☆☆☆☆☆</span>
+          <span class="big-rating" id="modal-avg-rating">0.0</span>
+          <span class="review-count">(<span id="modal-total-reviews">0</span> reviews)</span>
+        </div>
+      </div>
+      
+      <div class="rate-section">
+        <p class="rate-label">Your Rating:</p>
+        <div class="star-rating">
+          <span class="star" data-value="1" onclick="setRating(1)">☆</span>
+          <span class="star" data-value="2" onclick="setRating(2)">☆</span>
+          <span class="star" data-value="3" onclick="setRating(3)">☆</span>
+          <span class="star" data-value="4" onclick="setRating(4)">☆</span>
+          <span class="star" data-value="5" onclick="setRating(5)">☆</span>
+        </div>
+        <p id="rating-message" class="rating-message">Click a star to rate</p>
+      </div>
+      
+      <textarea id="review-text" placeholder="Write your review (optional)..." rows="3"></textarea>
+      
+      <button onclick="submitRating()" class="btn-rate">⭐ Submit Rating</button>
+      
+      <div id="reviews-list">
+        <h4>📝 Reviews</h4>
+        <div id="reviews-container">
+          <p class="no-reviews">No reviews yet. Be the first!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    let selectedLocationId = null;
+    let selectedRating = 0;
+    let allLocations = [];
+
+    function searchLocations() {
+      const query = document.getElementById('searchInput').value.trim();
+      
+      if (!query) {
+        alert('Please enter a search term!');
+        return;
+      }
+      
+      document.getElementById('ranking-container').innerHTML = '<p class="loading">Searching...</p>';
+      
+      fetch('/api/locations/search?q=' + encodeURIComponent(query))
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert('Error: ' + data.error);
+          document.getElementById('ranking-container').innerHTML = '<p class="no-results">Error searching. Please try again.</p>';
+          return;
+        }
+        
+        allLocations = data.locations || [];
+        document.getElementById('results-count').textContent = `Found ${allLocations.length} locations`;
+        displayRankings(allLocations);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('ranking-container').innerHTML = '<p class="no-results">Error searching. Please try again.</p>';
+      });
+    }
+
+    function displayRankings(locations) {
+      const container = document.getElementById('ranking-container');
+      
+      if (!locations || locations.length === 0) {
+        container.innerHTML = '<p class="no-results">No locations found. Try a different search.</p>';
+        return;
+      }
+      
+      const sorted = [...locations].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+      
+      container.innerHTML = sorted.map((loc, index) => {
+        const rating = loc.averageRating || 0;
+        const reviews = loc.totalReviews || 0;
+        const starDisplay = getStarDisplay(rating);
+        const rankColor = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
+        
+        return `
+          <div class="ranking-item" onclick="openRatingModal('${loc.id}', '${loc.name}', '${loc.address}')">
+            <div class="ranking-position ${rankColor}">#${index + 1}</div>
+            <div class="ranking-info">
+              <div class="ranking-name">${loc.name}</div>
+              <div class="ranking-address">${loc.address || 'Address not available'}</div>
+              <div class="ranking-rating">
+                <span class="stars">${starDisplay}</span>
+                <span class="rating-number">${rating.toFixed(1)}</span>
+                <span class="review-count">(${reviews} reviews)</span>
+              </div>
+            </div>
+            <div class="ranking-action">
+              <button onclick="event.stopPropagation(); openRatingModal('${loc.id}', '${loc.name}', '${loc.address}')" class="btn-rate-small">⭐ Rate</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getStarDisplay(rating) {
+      const fullStars = Math.floor(rating);
+      const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+      const emptyStars = 5 - fullStars - halfStar;
+      return '★'.repeat(fullStars) + (halfStar ? '½' : '') + '☆'.repeat(emptyStars);
+    }
+
+    function openRatingModal(locationId, name, address) {
+      selectedLocationId = locationId;
+      
+      document.getElementById('modal-location-name').textContent = name;
+      document.getElementById('modal-location-address').textContent = address || 'Address not available';
+      
+      resetStars();
+      document.getElementById('review-text').value = '';
+      document.getElementById('rating-message').textContent = 'Click a star to rate';
+      document.getElementById('rating-message').className = 'rating-message';
+      
+      document.getElementById('ratingModal').style.display = 'block';
+      loadRatings(locationId);
+    }
+
+    function closeRatingModal() {
+      document.getElementById('ratingModal').style.display = 'none';
+      selectedLocationId = null;
+      selectedRating = 0;
+    }
+
+    function setRating(value) {
+      selectedRating = value;
+      const stars = document.querySelectorAll('#ratingModal .star');
+      stars.forEach((star, index) => {
+        if (index < value) {
+          star.textContent = '★';
+          star.classList.add('active');
+        } else {
+          star.textContent = '☆';
+          star.classList.remove('active');
+        }
+      });
+      document.getElementById('rating-message').textContent = `You selected ${value} ⭐`;
+      document.getElementById('rating-message').className = 'rating-message selected';
+    }
+
+    function resetStars() {
+      selectedRating = 0;
+      const stars = document.querySelectorAll('#ratingModal .star');
+      stars.forEach(star => {
+        star.textContent = '☆';
+        star.classList.remove('active');
+      });
+    }
+
+    function submitRating() {
+      if (!selectedLocationId) {
+        alert('Please select a location first.');
+        return;
+      }
+      
+      if (selectedRating === 0) {
+        alert('Please select a star rating (1-5).');
+        return;
+      }
+      
+      const reviewText = document.getElementById('review-text').value.trim();
+      
+      const ratingData = {
+        locationId: selectedLocationId,
+        rating: selectedRating,
+        review: reviewText || ''
+      };
+      
+      const submitBtn = document.querySelector('.btn-rate');
+      submitBtn.textContent = 'Submitting...';
+      submitBtn.disabled = true;
+      
+      fetch('/api/ratings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ratingData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        submitBtn.textContent = '⭐ Submit Rating';
+        submitBtn.disabled = false;
+        
+        if (data.error) {
+          alert('❌ Error: ' + data.error);
+          return;
+        }
+        
+        document.getElementById('rating-message').textContent = '✅ Rating submitted! Thanks!';
+        document.getElementById('rating-message').className = 'rating-message success';
+        
+        loadRatings(selectedLocationId);
+        searchLocations();
+        
+        resetStars();
+        document.getElementById('review-text').value = '';
+      })
+      .catch(error => {
+        submitBtn.textContent = '⭐ Submit Rating';
+        submitBtn.disabled = false;
+        alert('❌ Error: ' + error.message);
+      });
+    }
+
+    function loadRatings(locationId) {
+      fetch('/api/ratings/location/' + locationId)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Error loading ratings:', data.error);
+          return;
+        }
+        
+        const avgRating = data.averageRating || 0;
+        const totalReviews = data.totalReviews || 0;
+        
+        document.getElementById('modal-avg-stars').textContent = getStarDisplay(avgRating);
+        document.getElementById('modal-avg-rating').textContent = avgRating.toFixed(1);
+        document.getElementById('modal-total-reviews').textContent = totalReviews;
+        
+        const reviewsContainer = document.getElementById('reviews-container');
+        if (data.reviews && data.reviews.length > 0) {
+          reviewsContainer.innerHTML = data.reviews.map(review => `
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-rating">${getStarDisplay(review.rating)}</span>
+                <span class="review-user">${review.username || 'Anonymous'}</span>
+                <span class="review-date">${review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ''}</span>
+              </div>
+              <p class="review-text">${review.review || 'No review text.'}</p>
+            </div>
+          `).join('');
+        } else {
+          reviewsContainer.innerHTML = '<p class="no-reviews">No reviews yet. Be the first!</p>';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading ratings:', error);
+      });
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('ratingModal');
+      if (event.target == modal) {
+        closeRatingModal();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('keypress', function(event) {
+          if (event.key === 'Enter') {
+            searchLocations();
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
