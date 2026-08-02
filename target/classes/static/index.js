@@ -38,6 +38,26 @@ async function createMap() {
     infoWindow = new InfoWindow();
     innerMap = mapElement.innerMap;
     const geocoder = new Geocoder();
+   
+
+const trafficupdate = new google.maps.TrafficLayer();
+let trafficOn = false;
+
+const legendElement = document.getElementById('traffic-legend');
+const trafficBtn = document.getElementById('traffic-btn');
+
+window.updateTraffic = function () {
+  trafficOn = !trafficOn;
+  trafficupdate.setMap(trafficOn ? innerMap : null);
+
+  if (legendElement){
+    legendElement.style.display = trafficOn ? 'block' : 'none';
+  }
+
+  if (trafficBtn){
+    trafficBtn.textContent = trafficOn ? 'Hide Traffic' : 'Show Traffic';
+  }
+};
 
     innerMap.setOptions({
         mapTypeControl: false,

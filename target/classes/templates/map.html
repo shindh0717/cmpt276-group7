@@ -34,8 +34,24 @@
       <button id="show-saved-btn">
         Show Saved Location
       </button>
+      <button type="button" onclick="updateTraffic()" id="traffic-btn">Traffic</button>
     </div>
   </gmp-map>
+  <div id="traffic-legend" style="display: none;">
+    <div class="legend-title">Traffic</div>
+    <div class="legend-item">
+        <span class="legend-color color-green"></span>
+        <span>Smooth</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color color-yellow"></span>
+        <span>Moderate</span>
+    </div>
+    <div class="legend-item">
+        <span class="legend-color color-red"></span>
+        <span>Heavy Traffic</span>
+    </div>
+  </div>
   <div id="saved-locations-panel" style="display: none;">
     <h3>Saved locations</h3>
     <ul>
