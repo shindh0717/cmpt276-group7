@@ -208,4 +208,35 @@ window.panToLocation = function(lat, lng){
   infoWindow.close();
 }
 
+// ===== GOOGLE PLACES SEARCH =====
+function searchGooglePlaces(query) {
+    const mapElement = document.querySelector('gmp-map');
+    // If you have a google.maps.Map object, use that instead
+    // For gmp-map custom element, we need to access the underlying map
+    const map = mapElement.innerMap || mapElement; 
+    const service = new google.maps.places.PlacesService(map);
+    
+    const request = {
+        query: query,
+        fields: ['place_id', 'name', 'formatted_address', 'rating', 'user_ratings_total']
+    };
+    
+    service.textSearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            const locations = results.map(place => ({
+                id: place.place_id,
+                name: place.name,
+                address: place.formatted_address,
+                averageRating: place.rating || 0,
+                totalReviews: place.user_ratings_total || 0
+            }));
+            
+            displayRankings(locations);
+        } else {
+            console.error('Places search failed:', status);
+            document.getElementById('ranking-container').innerHTML = '<p class="no-results">No locations found. Try a different search.</p>';
+        }
+    });
+}
+
 void createMap();

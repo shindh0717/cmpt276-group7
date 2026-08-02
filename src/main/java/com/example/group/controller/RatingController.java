@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 public class RatingController {
     @Autowired
     private RatingRepository repo;
+    
     @PostMapping("/rateLocation")
     public String rateLocation(@RequestParam String locationName, @RequestParam Double latitude, @RequestParam Double longitude,
             @RequestParam Integer rating, HttpSession session){
@@ -63,6 +64,7 @@ public class RatingController {
         }
         return total / ratings.size();
     }
+    
     @ResponseBody
     @GetMapping("/userRating")
     public int getUserRating( @RequestParam Double latitude, @RequestParam Double longitude, HttpSession session)
@@ -74,5 +76,11 @@ public class RatingController {
         }
         Optional<Rating> rating = repo.findByUserIdAndLatitudeAndLongitude(user.getId(), latitude, longitude);
         return rating.map(Rating::getRating).orElse(0);
+    }
+
+    @ResponseBody
+    @GetMapping("/locationReviews")
+    public List<Rating> getReviews(@RequestParam Double latitude, @RequestParam Double longitude) {
+        return repo.findByLatitudeAndLongitude(latitude, longitude); // ✅ Returns List<Rating>
     }
 }

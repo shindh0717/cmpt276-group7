@@ -723,3 +723,21 @@ gmp-map {
         font-size: 1.4rem;
     }
 }
+
+.user-tag {
+    background: #4CAF50;
+    color: white;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.3rem;
+}
+
+.google-tag {
+    background: #1a73e8;
+    color: white;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    margin-left: 0.3rem;
+}

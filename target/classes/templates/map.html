@@ -120,69 +120,128 @@
     let allLocations = [];
 
     function searchLocations() {
-      const query = document.getElementById('searchInput').value.trim();
-      
-      if (!query) {
+    const query = document.getElementById('searchInput').value.trim();
+    
+    if (!query) {
         alert('Please enter a search term!');
         return;
-      }
-      
-      document.getElementById('ranking-container').innerHTML = '<p class="loading">Searching...</p>';
-      
-      fetch('/api/locations/search?q=' + encodeURIComponent(query))
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          alert('Error: ' + data.error);
-          document.getElementById('ranking-container').innerHTML = '<p class="no-results">Error searching. Please try again.</p>';
-          return;
+    }
+    
+    document.getElementById('ranking-container').innerHTML = '<p class="loading">Searching...</p>';
+    
+    const mapElement = document.querySelector('gmp-map');
+    const map = mapElement.innerMap || mapElement;
+    const service = new google.maps.places.PlacesService(map);
+    
+    const request = {
+        query: query,
+        fields: ['place_id', 'name', 'formatted_address', 'rating', 'user_ratings_total', 'geometry']
+    };
+    
+    service.textSearch(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            const googleLocations = results.map(place => ({
+                id: place.place_id,
+                name: place.name,
+                address: place.formatted_address,
+                googleRating: place.rating || 0,
+                googleTotalReviews: place.user_ratings_total || 0,
+                userRating: 0,
+                userTotalReviews: 0,
+                averageRating: place.rating || 0,
+                totalReviews: place.user_ratings_total || 0,
+                lat: place.geometry?.location?.lat() || null,  // ← ADDED
+                lng: place.geometry?.location?.lng() || null   // ← ADDED
+            }));
+            
+            fetchUserRatings(googleLocations);
+        } else {
+            console.error('Places search failed:', status);
+            document.getElementById('ranking-container').innerHTML = '<p class="no-results">No locations found. Try a different search.</p>';
+        }
+    });
+}
+
+    function fetchUserRatings(locations) {
+    const promises = locations.map(loc => {
+        // Aveer's backend uses latitude and longitude, not place_id
+        if (!loc.lat || !loc.lng) {
+            // If no lat/lng, skip this location
+            return Promise.resolve(loc);
         }
         
-        allLocations = data.locations || [];
+        const url = '/locationRating?latitude=' + loc.lat + '&longitude=' + loc.lng;
+        return fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data > 0) {
+                    loc.userRating = data;
+                    loc.userTotalReviews = 1; // Aveer's endpoint doesn't return count
+                    loc.averageRating = data;
+                    loc.totalReviews = 1;
+                } else {
+                    loc.averageRating = loc.googleRating;
+                    loc.totalReviews = loc.googleTotalReviews;
+                }
+                return loc;
+            })
+            .catch(() => {
+                loc.averageRating = loc.googleRating;
+                loc.totalReviews = loc.googleTotalReviews;
+                return loc;
+            });
+    });
+    
+    Promise.all(promises).then(updatedLocations => {
+        allLocations = updatedLocations;
         document.getElementById('results-count').textContent = `Found ${allLocations.length} locations`;
         displayRankings(allLocations);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('ranking-container').innerHTML = '<p class="no-results">Error searching. Please try again.</p>';
-      });
-    }
+    });
+}
 
     function displayRankings(locations) {
-      const container = document.getElementById('ranking-container');
-      
-      if (!locations || locations.length === 0) {
+    const container = document.getElementById('ranking-container');
+    
+    if (!locations || locations.length === 0) {
         container.innerHTML = '<p class="no-results">No locations found. Try a different search.</p>';
         return;
-      }
-      
-      const sorted = [...locations].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
-      
-      container.innerHTML = sorted.map((loc, index) => {
+    }
+    
+    const sorted = [...locations].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+    
+    container.innerHTML = sorted.map((loc, index) => {
         const rating = loc.averageRating || 0;
         const reviews = loc.totalReviews || 0;
         const starDisplay = getStarDisplay(rating);
         const rankColor = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
+        const hasUserRatings = loc.userTotalReviews > 0;
+        const ratingSource = hasUserRatings ? '⭐ User Rated' : '📊 Google';
+        const sourceClass = hasUserRatings ? 'user-tag' : 'google-tag';
+        
+        // Escape apostrophes in name and address
+        const safeName = loc.name.replace(/'/g, "\\'");
+        const safeAddress = (loc.address || 'Address not available').replace(/'/g, "\\'");
         
         return `
-          <div class="ranking-item" onclick="openRatingModal('${loc.id}', '${loc.name}', '${loc.address}')">
-            <div class="ranking-position ${rankColor}">#${index + 1}</div>
-            <div class="ranking-info">
-              <div class="ranking-name">${loc.name}</div>
-              <div class="ranking-address">${loc.address || 'Address not available'}</div>
-              <div class="ranking-rating">
-                <span class="stars">${starDisplay}</span>
-                <span class="rating-number">${rating.toFixed(1)}</span>
-                <span class="review-count">(${reviews} reviews)</span>
-              </div>
+            <div class="ranking-item" onclick="openRatingModal('${loc.id}', '${safeName}', '${safeAddress}')">
+                <div class="ranking-position ${rankColor}">#${index + 1}</div>
+                <div class="ranking-info">
+                    <div class="ranking-name">${loc.name}</div>
+                    <div class="ranking-address">${loc.address || 'Address not available'}</div>
+                    <div class="ranking-rating">
+                        <span class="stars">${starDisplay}</span>
+                        <span class="rating-number">${rating.toFixed(1)}</span>
+                        <span class="review-count">(${reviews} reviews)</span>
+                        <span class="${sourceClass}">${ratingSource}</span>
+                    </div>
+                </div>
+                <div class="ranking-action">
+                    <button class="btn-rate-small" data-id="${loc.id}" data-name="${safeName}" data-address="${safeAddress}">⭐ Rate</button>
+                </div>
             </div>
-            <div class="ranking-action">
-              <button onclick="event.stopPropagation(); openRatingModal('${loc.id}', '${loc.name}', '${loc.address}')" class="btn-rate-small">⭐ Rate</button>
-            </div>
-          </div>
         `;
-      }).join('');
-    }
+    }).join('');
+}
 
     function getStarDisplay(rating) {
       const fullStars = Math.floor(rating);
@@ -238,97 +297,112 @@
     }
 
     function submitRating() {
-      if (!selectedLocationId) {
+    if (!selectedLocationId) {
         alert('Please select a location first.');
         return;
-      }
-      
-      if (selectedRating === 0) {
+    }
+    
+    if (selectedRating === 0) {
         alert('Please select a star rating (1-5).');
         return;
-      }
-      
-      const reviewText = document.getElementById('review-text').value.trim();
-      
-      const ratingData = {
-        locationId: selectedLocationId,
-        rating: selectedRating,
-        review: reviewText || ''
-      };
-      
-      const submitBtn = document.querySelector('.btn-rate');
-      submitBtn.textContent = 'Submitting...';
-      submitBtn.disabled = true;
-      
-      fetch('/api/ratings', {
+    }
+    
+    const reviewText = document.getElementById('review-text').value.trim();
+    
+    // Find the location data
+    const location = allLocations.find(loc => loc.id === selectedLocationId);
+    if (!location) {
+        alert('Location not found. Please search again.');
+        return;
+    }
+    
+    // Aveer's backend expects: locationName, latitude, longitude, rating
+    const formData = new URLSearchParams();
+    formData.append('locationName', location.name);
+    formData.append('latitude', location.lat || 0);
+    formData.append('longitude', location.lng || 0);
+    formData.append('rating', selectedRating);
+    
+    const submitBtn = document.querySelector('.btn-rate');
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+    
+    fetch('/rateLocation', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: JSON.stringify(ratingData)
-      })
-      .then(response => response.json())
-      .then(data => {
+        body: formData.toString()
+    })
+    .then(response => {
         submitBtn.textContent = '⭐ Submit Rating';
         submitBtn.disabled = false;
         
-        if (data.error) {
-          alert('❌ Error: ' + data.error);
-          return;
+        if (response.ok) {
+            document.getElementById('rating-message').textContent = '✅ Rating submitted! Thanks!';
+            document.getElementById('rating-message').className = 'rating-message success';
+            
+            loadRatings(selectedLocationId);
+            searchLocations();
+            
+            resetStars();
+            document.getElementById('review-text').value = '';
+        } else {
+            alert('❌ Error submitting rating. Please try again.');
         }
-        
-        document.getElementById('rating-message').textContent = '✅ Rating submitted! Thanks!';
-        document.getElementById('rating-message').className = 'rating-message success';
-        
-        loadRatings(selectedLocationId);
-        searchLocations();
-        
-        resetStars();
-        document.getElementById('review-text').value = '';
-      })
-      .catch(error => {
+    })
+    .catch(error => {
         submitBtn.textContent = '⭐ Submit Rating';
         submitBtn.disabled = false;
         alert('❌ Error: ' + error.message);
-      });
-    }
+    });
+}
 
     function loadRatings(locationId) {
-      fetch('/api/ratings/location/' + locationId)
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          console.error('Error loading ratings:', data.error);
-          return;
-        }
-        
-        const avgRating = data.averageRating || 0;
-        const totalReviews = data.totalReviews || 0;
-        
-        document.getElementById('modal-avg-stars').textContent = getStarDisplay(avgRating);
-        document.getElementById('modal-avg-rating').textContent = avgRating.toFixed(1);
-        document.getElementById('modal-total-reviews').textContent = totalReviews;
-        
-        const reviewsContainer = document.getElementById('reviews-container');
-        if (data.reviews && data.reviews.length > 0) {
-          reviewsContainer.innerHTML = data.reviews.map(review => `
-            <div class="review-item">
-              <div class="review-header">
-                <span class="review-rating">${getStarDisplay(review.rating)}</span>
-                <span class="review-user">${review.username || 'Anonymous'}</span>
-                <span class="review-date">${review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ''}</span>
-              </div>
-              <p class="review-text">${review.review || 'No review text.'}</p>
-            </div>
-          `).join('');
-        } else {
-          reviewsContainer.innerHTML = '<p class="no-reviews">No reviews yet. Be the first!</p>';
-        }
-      })
-      .catch(error => {
-        console.error('Error loading ratings:', error);
-      });
+    const location = allLocations.find(loc => loc.id === locationId);
+    if (!location || !location.lat || !location.lng) {
+        document.getElementById('modal-avg-stars').textContent = '☆☆☆☆☆';
+        document.getElementById('modal-avg-rating').textContent = '0.0';
+        document.getElementById('modal-total-reviews').textContent = '0';
+        document.getElementById('reviews-container').innerHTML = '<p class="no-reviews">No reviews yet. Be the first!</p>';
+        return;
     }
+    
+    // Get average rating
+    fetch('/locationRating?latitude=' + location.lat + '&longitude=' + location.lng)
+        .then(response => response.json())
+        .then(avgRating => {
+            document.getElementById('modal-avg-stars').textContent = getStarDisplay(avgRating || 0);
+            document.getElementById('modal-avg-rating').textContent = (avgRating || 0).toFixed(1);
+            
+            // Get individual reviews from NEW endpoint
+            return fetch('/locationReviews?latitude=' + location.lat + '&longitude=' + location.lng);
+        })
+        .then(response => response.json())
+        .then(reviews => {
+            document.getElementById('modal-total-reviews').textContent = reviews ? reviews.length : 0;
+            
+            const reviewsContainer = document.getElementById('reviews-container');
+            if (reviews && reviews.length > 0) {
+                reviewsContainer.innerHTML = reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-rating">${getStarDisplay(review.rating)}</span>
+                            <span class="review-user">User ${review.userId || 'Anonymous'}</span>
+                            <span class="review-date">${review.createdAt ? new Date(review.createdAt).toLocaleDateString() : ''}</span>
+                        </div>
+                        <p class="review-text">Rating: ${review.rating} stars</p>
+                    </div>
+                `).join('');
+            } else {
+                reviewsContainer.innerHTML = '<p class="no-reviews">No reviews yet. Be the first!</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading reviews:', error);
+            document.getElementById('reviews-container').innerHTML = '<p class="no-reviews">No reviews yet. Be the first!</p>';
+        });
+}
 
     window.onclick = function(event) {
       const modal = document.getElementById('ratingModal');
@@ -347,6 +421,13 @@
         });
       }
     });
+
+    window.openRatingModal = openRatingModal;
+    window.submitRating = submitRating;
+    window.setRating = setRating;
+    window.closeRatingModal = closeRatingModal;
+    window.searchLocations = searchLocations;
+
   </script>
 </body>
 </html>
