@@ -285,3 +285,49 @@ ol li {
     height: 30px;
     padding: 0 15px;
 }
+
+#traffic-legend {
+    position: absolute;
+    top: 10px;
+    right: 315px;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    z-index: 100;
+    font-size: 15px;
+    border: 3px solid black;
+}
+
+#traffic-legend .legend-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#traffic-legend .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#traffic-legend .legend-item:last-child {
+    margin-bottom: 0;
+}
+
+#traffic-legend .legend-color {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.color-green {
+ background: #188038;
+}
+.color-yellow {
+ background: #f9ab00; 
+}
+.color-red {
+ background: #d93025; 
+}
