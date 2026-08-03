@@ -733,6 +733,14 @@ gmp-map {
     margin-left: 0.3rem;
 }
 
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    height: 100vh;
+    overflow: hidden;
+}
+
 .google-tag {
     background: #1a73e8;
     color: white;
