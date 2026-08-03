@@ -23,7 +23,7 @@ public class Route {
     private boolean shared;
     @ManyToOne
     private User createdBy;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Location> locations;
     public Long getId() {
         return id;

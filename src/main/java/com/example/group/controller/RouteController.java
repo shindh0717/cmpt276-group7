@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -70,10 +71,12 @@ public class RouteController {
 
         Route route = routeRepository.findById(id).orElseThrow();
 
-        String shareUrl = request.getRequestURL().toString();
-
         model.addAttribute("route", route);
-        model.addAttribute("shareUrl", shareUrl);
+        
+        model.addAttribute(
+        "shareUrl",
+        request.getRequestURL().toString()
+    );
 
         return "route-shared";
     }

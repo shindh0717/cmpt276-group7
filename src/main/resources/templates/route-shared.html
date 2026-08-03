@@ -1,64 +1,233 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title th:text="${route.name} + ' - Shared Route'">Shared Route - WhereTo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${route.name} + ' - Shared Route'">
+        Shared Route - WhereTo
+    </title>
+
     <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <div class="container">
-        <h1>🗺️ <span th:text="${route.name}">Route Name</span></h1>
-        
-        <div class="shared-info">
-            <p><strong>Shared by:</strong> <span th:text="${route.createdBy.email}">user@example.com</span></p>
-            <p><strong>Description:</strong> <span th:text="${route.description}">Description</span></p>
-        </div>
-        
-        <h3>📍 Stops</h3>
-        <ol>
-            <li th:each="location : ${route.locations}">
-                <span th:text="${location}">Location Name</span>
-            </li>
-        </ol>
-        
-        <div class ="share-section" th:if="${shareUrl != null}">
-            <h1>share this route</h1>
-            <input
-                id="shareLink"
-                type="text"
-                th:value="${shareUrl}"
-                readonly>
-            <button onclick="copyShareLink()">
-                Copy Link
-            </button>
-        </div>
 
-        <div class = "actions">
-            <a href="/login" class = "btn-primary">
-                Login to Save This Route
-            </a>
-
-            <a href = "/" class="btn-back">
-                To Home
-            </a>
-
-            <a href="/latest-route">
-                View My Latest Route
-            </a>
-
-        </div>
-        
-    </div>
-        
     <script>
-        function copyShareLink() {
-            const input = document.getElementById("shareLink");
-
-            input.select();
-            input.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(input.value);
-            alert("Share Link Copied")
-        }
+    (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",
+    q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),
+    r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{
+    await (a=m.createElement("script"));
+    e.set("libraries",[...r]+"");
+    for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);
+    e.set("callback",c+".maps."+q);
+    a.src=`https://maps.${c}apis.com/maps/api/js?`+e;
+    d[q]=f;
+    a.onerror=()=>h=n(Error(p+" could not load."));
+    a.nonce=m.querySelector("script[nonce]")?.nonce||"";
+    m.head.append(a)
+    }));
+    d[l]?console.warn(p+" only loads once. Ignoring:",g):
+    d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))
+    })
+    ({
+        key:"AIzaSyAMoapWcdUnJXZLIOj8Qgp2t1sTDLGHzqU",
+        v:"weekly",
+        language:"en"
+    });
     </script>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        🗺️
+        <span th:text="${route.name}">
+            Route Name
+        </span>
+    </h1>
+
+
+
+    <div class="shared-info">
+
+        <p>
+            <strong>Shared by:</strong>
+
+            <span th:text="${route.createdBy.email}">
+                user@example.com
+            </span>
+
+        </p>
+
+
+        <p>
+            <strong>Description:</strong>
+
+            <span th:text="${route.description}">
+                Description
+            </span>
+
+        </p>
+
+    </div>
+
+
+
+
+    <h3>📍 Stops</h3>
+
+
+    <ol>
+
+        <li th:each="location : ${route.locations}">
+
+            <span th:text="${location.name}">
+                Location
+            </span>
+
+        </li>
+
+    </ol>
+
+
+    <gmp-map
+        zoom="15"
+        map-id="DEMO_MAP_ID">
+
+        <gmp-advanced-marker></gmp-advanced-marker>
+
+        <div id="controls"
+             slot="control-inline-start-block-start">
+
+            <select class="type-select">
+
+                <option value="" selected>
+                    Similar location
+                </option>
+
+                <option value="cafe">
+                    Cafe
+                </option>
+
+                <option value="restaurant">
+                    Restaurant
+                </option>
+
+                <option value="museum">
+                    Museum
+                </option>
+
+                <option value="park">
+                    Park
+                </option>
+
+            </select>
+
+            <a href="/logout"
+               class="btn-logout">
+                Logout
+            </a>
+        </div>
+    </gmp-map>
+
+    <div class="share-section"
+         th:if="${shareUrl != null}">
+
+        <h2>
+            Share this route
+        </h2>
+
+        <input
+            id="shareLink"
+            type="text"
+            th:value="${shareUrl}"
+            readonly>
+
+        <button onclick="copyShareLink()">
+            Copy Link
+        </button>
+    </div>
+
+    <div class="actions">
+        <a href="/login"
+           class="btn-primary">
+            Login to Save This Route
+        </a>
+
+        <a href="/"
+           class="btn-back">
+            Home
+        </a>
+
+        <a href="/latest-route">
+            View My Latest Route
+        </a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+
+const locations = [
+
+    /*[# th:each="loc : ${route.locations}"]*/
+
+    {
+        name: "[[${loc.name}]]",
+        latitude: [[${loc.latitude}]],
+        longitude: [[${loc.longitude}]]
+    },
+
+    /*[/]*/
+
+];
+
+
+console.log("Route locations:", locations);
+
+
+</script>
+
+
+
+
+
+<script type="module" src="/js/sharedroute.js"></script>
+
+
+
+
+<script>
+
+function copyShareLink(){
+
+    const input =
+        document.getElementById("shareLink");
+
+
+    input.select();
+
+    input.setSelectionRange(
+        0,
+        99999
+    );
+
+
+    navigator.clipboard.writeText(
+        input.value
+    );
+
+
+    alert(
+        "Share Link Copied"
+    );
+
+}
+</script>
 </body>
+
 </html>
