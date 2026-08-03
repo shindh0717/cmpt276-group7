@@ -36,6 +36,7 @@
           <button id="show-saved-btn">
             Show Saved Location
           </button>
+          <button type="button" onclick="updateTraffic()">Traffic</button>
         </div>
       </gmp-map>
     </div>
@@ -55,6 +56,31 @@
           <p class="no-results">🔍 Search for a place to see rankings</p>
         </div>
       </div>
+  <gmp-map 
+    zoom="15" 
+    map-id="DEMO_MAP_ID"
+  >
+    <gmp-advanced-marker id="marker"></gmp-advanced-marker>
+    <div id="controls" slot="control-inline-start-block-start">
+      <select name="types" class="type-select">
+        <option value="" selected>Similar location</option>
+        <option value="cafe">Cafe</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="museum">Museum</option>
+        <option value="park">Park</option>
+      </select>
+      <form id="save-form" th:action="@{/saveLocation}" method="post">
+        <input type="hidden" id="lat-input" name="latitude" />
+        <input type="hidden" id="lng-input" name="longitude" />
+        <input type="hidden" id="name-input" name="locationName"/>
+      </form>
+      <button>
+        <a href="/logout" class="btn-logout">Logout</a>
+      </button>
+      <button id="show-saved-btn">
+        Show Saved Location
+      </button>
+      <button type="button" onclick="updateTraffic()">Traffic</button>
     </div>
   </div>
 
