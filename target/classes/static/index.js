@@ -1,11 +1,16 @@
 const mapElement = document.querySelector('gmp-map');
 const typeSelect = document.querySelector('.type-select');
 var innerMap, currentLocationDot, infoWindow;
+
 const marker = document.getElementById("marker");
 const latInput = document.getElementById("lat-input");
 const lngInput = document.getElementById("lng-input");
-const showSavedBtn = document.getElementById('show-saved-btn');
-const savedLocationsPanel = document.getElementById('saved-locations-panel');
+const showSavedBtn = document.getElementById("show-saved-btn");
+const savedLocationsPanel = document.getElementById("saved-locations-panel");
+
+let directionsRenderer = null;
+let currentRoute=null
+let mapReady = false;
 
 function createCurrentDot(){
   const div = document.createElement('div');
@@ -16,97 +21,20 @@ function createCurrentDot(){
   return div;
 }
 
-window.savePlace = function(name, lat, lng){
-  const savedOnes = savedLocationsPanel.innerText || savedLocationsPanel.textContent;
-
-  if(savedOnes.includes(name)){
-    alert("This location is already saved");
-    return;
-  }
-
-  document.getElementById('lat-input').value = lat;
-  document.getElementById('lng-input').value = lng;
-  document.getElementById('name-input').value = name;
-  document.getElementById('save-form').submit();  
-}
-
 async function createMap() {
     const { Map, InfoWindow } = await google.maps.importLibrary('maps');
     const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
-    const { Geocoder } = await google.maps.importLibrary('geocoding');
+    const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary('routes');
 
+    await mapElement.innerMapReady;
+    mapReady = true;
     infoWindow = new InfoWindow();
     innerMap = mapElement.innerMap;
-    const geocoder = new Geocoder();
-   
-
-const trafficupdate = new google.maps.TrafficLayer();
-let trafficOn = false;
-
-const legendElement = document.getElementById('traffic-legend');
-const trafficBtn = document.getElementById('traffic-btn');
-
-window.updateTraffic = function () {
-  trafficOn = !trafficOn;
-  trafficupdate.setMap(trafficOn ? innerMap : null);
-
-  if (legendElement){
-    legendElement.style.display = trafficOn ? 'block' : 'none';
-  }
-
-  if (trafficBtn){
-    trafficBtn.textContent = trafficOn ? 'Hide Traffic' : 'Show Traffic';
-  }
-};
+    mapReady = true;
 
     innerMap.setOptions({
         mapTypeControl: false,
-        clickableIcons: false,
     });
-
-    marker.addListener("click", () => {
-      infoWindow.open({
-        anchor: marker,
-        map: innerMap,
-      });
-    });
-
-    innerMap.addListener("click", (e) => {
-      if (!e.latLng){
-        return;
-      }
-      infoWindow.close();
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-
-      marker.position = { lat, lng };
-      marker.map = innerMap;
-
-      latInput.value = lat;
-      lngInput.value = lng;
-
-      geocoder.geocode({location: {lat, lng}}, (results, status) => {
-        const address = (status === "OK" && results[0]) ? results[0].formatted_address : "Address not found";
-        
-        const nameInput = document.getElementById("name-input");
-        if (nameInput){
-          nameInput.value = address;
-        }
-        
-        const selectedInfo = `
-          <div>
-            <strong>Selected Location</strong>
-            <div>${address}</div>
-            <button onclick="document.getElementById('save-form').submit();" id="save-location-btn" style="margin-top: 10px;">Save This Location</button>
-          </div>
-        `;
-        infoWindow.setContent(selectedInfo);
-        infoWindow.open({
-          anchor: marker,
-          map: innerMap,
-        });
-      });
-    })
 
     navigator.geolocation.getCurrentPosition((position) => {
       const pos = {
@@ -203,60 +131,321 @@ async function searchSimilar(){
   }
 }
 
-showSavedBtn.addEventListener('click', () => {
-  if (savedLocationsPanel.style.display === 'none'){
-    savedLocationsPanel.style.display = 'block';
-    showSavedBtn.textContent = 'Hide Saved Location';
-  }
-  else{
-    savedLocationsPanel.style.display = 'none';
-    showSavedBtn.textContent = 'Show Saved Location';
-  }
-})
+/*async function drawRoute() {
 
-window.panToLocation = function(lat, lng){
-  if (!innerMap){
-    return;
-  }
-  const targetPos = {lat: Number(lat), lng: Number(lng)};
-  innerMap.setCenter(targetPos);
-  innerMap.setZoom(15);
+    if (!locations || locations.length < 2) {
+        console.log("Not enough locations to create route");
+        return;
+    }
 
-  marker.position = targetPos;
-  marker.map = innerMap;
 
-  infoWindow.close();
+    const directionsService =
+        new google.maps.DirectionsService();
+
+
+    const directionsRenderer =
+        new google.maps.DirectionsRenderer({
+            suppressMarkers: false
+        });
+
+
+    directionsRenderer.setMap(innerMap);
+
+
+
+    const origin = {
+        lat: locations[0].latitude,
+        lng: locations[0].longitude
+    };
+
+
+    const destination = {
+        lat: locations[locations.length - 1].latitude,
+        lng: locations[locations.length - 1].longitude
+    };
+
+
+
+    const waypoints = locations
+        .slice(1, -1)
+        .map(location => ({
+            location: {
+                lat: location.latitude,
+                lng: location.longitude
+            },
+            stopover: true
+        }));
+
+
+
+    directionsService.route({
+
+        origin,
+
+        destination,
+
+        waypoints,
+
+        travelMode:
+            google.maps.TravelMode.DRIVING
+
+    })
+
+    .then(response => {
+
+        directionsRenderer.setDirections(response);
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Could not create route:",
+            error
+        );
+
+    });
+
+}*/
+
+
+
+//let map;
+//let routePolyline;
+
+
+/*async function initMap(){
+
+    const {Map} = await google.maps.importLibrary("maps");
+    const {AdvancedMarkerElement} =
+        await google.maps.importLibrary("marker");
+
+
+    map = new Map(
+        document.querySelector("gmp-map"),
+        {
+            zoom: 12,
+            center:{
+                lat:49.2827,
+                lng:-123.1207
+            }
+        }
+    );
+
+}*/
+
+
+async function createRoute() {
+
+    const input = document.getElementById("locations").value;
+
+    const placeNames = input
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+
+
+    if (placeNames.length < 2) {
+        alert("Please enter at least two locations");
+        return;
+    }
+
+
+    const locations = [];
+
+
+    for (const place of placeNames) {
+
+        try {
+
+            const location = await geocodeLocation(place);
+            locations.push(location);
+
+        } catch (error) {
+
+            alert(error);
+            return;
+
+        }
+    }
+
+    currentRoute = {
+        name: "My Route",
+        description: "Created from map",
+        shared: false,
+        locations: locations
+    };
+
+    displayRoute(locations);
 }
 
-// ===== GOOGLE PLACES SEARCH =====
-function searchGooglePlaces(query) {
-    const mapElement = document.querySelector('gmp-map');
-    // If you have a google.maps.Map object, use that instead
-    // For gmp-map custom element, we need to access the underlying map
-    const map = mapElement.innerMap || mapElement; 
-    const service = new google.maps.places.PlacesService(map);
-    
-    const request = {
-        query: query,
-        fields: ['place_id', 'name', 'formatted_address', 'rating', 'user_ratings_total']
+async function uploadRoute() {
+
+    if (!currentRoute) {
+        alert("Create a route before uploading");
+        return;
+    }
+
+    const response = await fetch("/api/routes/create", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(currentRoute)
+    });
+
+    if (!response.ok) {
+        alert("Could not upload route");
+        return;
+    }
+
+    const savedRoute = await response.json();
+
+    // Remember the database ID for sharing later
+    currentRoute.id = savedRoute.id;
+
+    alert("Route uploaded successfully");
+
+}
+
+
+async function displayRoute(locations) {
+
+    if (!mapReady) {
+        alert("Map is still loading");
+        return;
+    }
+
+    if (!locations || locations.length < 2) {
+        alert("A route needs at least 2 locations");
+        return;
+    }
+
+    if (directionsRenderer !== null) {
+    directionsRenderer.setMap(null);
+    directionsRenderer = null;
+}
+
+
+    const { DirectionsService, DirectionsRenderer } =
+        await google.maps.importLibrary("routes");
+
+
+    const directionsService = new DirectionsService();
+
+
+    directionsRenderer = new DirectionsRenderer({
+        suppressMarkers: false,
+        preserveViewport: false
+    });
+
+
+    directionsRenderer.setMap(innerMap);
+
+
+    const origin = {
+        lat: locations[0].latitude,
+        lng: locations[0].longitude
     };
-    
-    service.textSearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            const locations = results.map(place => ({
-                id: place.place_id,
-                name: place.name,
-                address: place.formatted_address,
-                averageRating: place.rating || 0,
-                totalReviews: place.user_ratings_total || 0
-            }));
-            
-            displayRankings(locations);
-        } else {
-            console.error('Places search failed:', status);
-            document.getElementById('ranking-container').innerHTML = '<p class="no-results">No locations found. Try a different search.</p>';
-        }
+
+
+    const destination = {
+        lat: locations[locations.length - 1].latitude,
+        lng: locations[locations.length - 1].longitude
+    };
+
+
+    const waypoints = locations
+        .slice(1, -1)
+        .map(location => ({
+            location: {
+                lat: location.latitude,
+                lng: location.longitude
+            },
+            stopover: true
+        }));
+
+
+    directionsService.route({
+        origin: origin,
+        destination: destination,
+        waypoints: waypoints,
+        travelMode: google.maps.TravelMode.DRIVING
+
+    })
+    .then(response => {
+
+        directionsRenderer.setDirections(response);
+
+    })
+    .catch(error => {
+
+        console.error("Route error:", error);
+
     });
 }
+
+async function geocodeLocation(address) {
+    const geocoder = new google.maps.Geocoder();
+
+    return new Promise((resolve, reject) => {
+        geocoder.geocode({ address: address }, (results, status) => {
+
+            if (status === "OK" && results.length > 0) {
+                const point = results[0].geometry.location;
+
+                resolve({
+                    name: address,
+                    latitude: point.lat(),
+                    longitude: point.lng()
+                });
+            } else {
+                reject("Could not find location: " + address);
+            }
+        });
+    });
+}
+
+
+
+async function shareRoute() {
+
+    if (!currentRoute || !currentRoute.id) {
+        alert("Upload the route first");
+        return;
+    }
+
+    const response = await fetch("/routes/" + currentRoute.id + "/share", {
+        method: "POST"
+    });
+
+    if (!response.ok) {
+        alert("Could not share route");
+        return;
+    }
+
+    const shareUrl =
+        window.location.origin +
+        "/route-shared/" +
+        currentRoute.id;
+
+    document.getElementById("shareLink").value = shareUrl;
+    document.getElementById("shareSection").style.display = "block";
+}
+
+document
+.getElementById("createRoute")
+.onclick = createRoute;
+
+
+document
+.getElementById("saveRoute")
+.onclick = uploadRoute;
+
+document
+.getElementById("shareRoute")
+.onclick = shareRoute;
+
+//initMap();
 
 void createMap();
