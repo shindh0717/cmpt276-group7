@@ -58,8 +58,8 @@ async function searchSimilar(){
 
   const markers = mapElement.querySelectorAll('gmp-advanced-marker');
   markers.forEach(marker => {
-    if (marker != currentLocationDot){
-      marker.map = null;
+    if (m != currentLocationDot && m != marker){
+      m.map = null;
     }
   })
 
@@ -91,7 +91,7 @@ async function searchSimilar(){
   const { places } = await Place.searchNearby(request);
 
   if (places.length > 0){
-    places.forEach((place) => {
+    places.forEach((place, i) => {
       const marker = new AdvancedMarkerElement({
         map: innerMap,
         position: place.location,
@@ -102,7 +102,7 @@ async function searchSimilar(){
           <div>${place.formattedAddress}</div>
         </div>
       `;
-      marker.addListener("click", () => {
+      marker.addListener("click", (e) => {
         infoWindow.setContent(info);
         infoWindow.open({
           anchor: marker,
